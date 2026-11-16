@@ -24,3 +24,24 @@ window.open = function (url, target, features) {
 }
 
 document.addEventListener('click', hookClick, { capture: true })
+
+
+// PakePlus 打印专属注入脚本
+(() => {
+  // 1. 全局非法协议拦截，彻底屏蔽about:协议弹窗
+  window.addEventListener('beforeunload', (e) => {
+    const allowedProtocols = ['http:', 'https:', 'file:', 'data:'];
+    try {
+      const targetUrl = new URL(window.location.href);
+      if (!allowedProtocols.includes(targetUrl.protocol)) {
+        e.preventDefault();
+        console.log('已拦截非法协议跳转，避免系统弹窗');
+        return false;
+      }
+    } catch (err) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+
