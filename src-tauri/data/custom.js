@@ -5,7 +5,7 @@ const hookClick = (e) => {
     const isBaseTargetBlank = document.querySelector(
         'head base[target="_blank"]'
     )
-     const isPrintBtn = e.target.closest('.print-btn') || e.target.closest('#print-btn')
+     const isPrintBtn = e.target.closest('.dy_jm') || e.target.closest('#dy_jm')
     if (isPrintBtn) {
         console.log('检测到打印按钮点击，直接放行')
         return
