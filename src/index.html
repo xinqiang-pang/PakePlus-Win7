@@ -62,7 +62,10 @@
       text-align: center;
       color: #64748b;
       font-size: 14px;
-      margin-bottom: 30px;
+      margin-bottom: 16px;
+    }
+       .tip-text3 {
+      margin-bottom: 3px;
     }
     .submit-btn {
       width: 100%;
@@ -75,11 +78,32 @@
       font-weight: 500;
       cursor: pointer;
       transition: background 0.2s ease;
+      padding: 2px;
     }
     .submit-btn:hover {
       background: #1d4ed8;
     }
     .submit-btn:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+      .submit-btnqz {
+      width: 100%;
+      height: 50px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      padding: 2px;
+    }
+    .submit-btnqz:hover {
+      background: #1d4ed8;
+    }
+    .submit-btnqz:disabled {
       background: #93c5fd;
       cursor: not-allowed;
     }
@@ -110,7 +134,9 @@
       <input type="text" class="ip-input" placeholder="例如：192.168.1.1" maxlength="15">
     </div>
     <p class="tip-text">请输入合法的IPv4地址，每段范围0-255</p>
-    <button class="submit-btn">链接</button>
+    <button class="submit-btn">普通链接</button>
+    <p class="tip-text3"></p>
+    <button class="submit-btnqz">重置链接</button>
     <div class="result-tip"></div>
   </div>
 
@@ -118,6 +144,7 @@
     document.getElementById("body").style.backgroundImage = "url('./ippz.png')"
     const ipInput = document.querySelector('.ip-input');
     const submitBtn = document.querySelector('.submit-btn');
+    const submitBtnqz = document.querySelector('.submit-btnqz');
     const resultTip = document.querySelector('.result-tip');
 
     // 实时格式化与校验
@@ -157,7 +184,14 @@
 
     // 提交校验与跳转
     submitBtn.addEventListener('click', () => {
-      const ip = ipInput.value.trim();
+ wy_dd("普通")
+    });
+       submitBtnqz.addEventListener('click', () => {
+ wy_dd("重置")
+    });
+
+    function wy_dd(fs){
+     const ip = ipInput.value.trim();
       
       // IPv4 正则表达式校验
       const ipv4Regex = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
@@ -171,16 +205,33 @@
         resultTip.className = 'result-tip success';
         
         setTimeout(() => {
-          window.location.assign(targetUrl);
+          if (fs=="普通"){ window.location.assign(targetUrl)}
+          if (fs=="重置"){ window.location.assign(targetUrl+ '?t=' + Date.now());}  
+         
+
         }, 800);
       } else {
         ipInput.classList.add('error');
         resultTip.textContent = '❌ IP地址格式不正确，请检查每段是否在0-255之间';
         resultTip.className = 'result-tip error';
       }
-      window.localStorage.setItem("ip",ip)
-    });
-    if(window.localStorage.getItem("ip")){ipInput.value=window.localStorage.getItem("ip")}
+     localStorage.setItem("ip_result_zj",ip)
+     setCookie("ip_result_zj", ip, 7);
+
+    
+    }
+
+    
+
+
+
+     alert("  她她她 "+localStorage.getItem("ip_result_zj"))
+    alert(getCookie("ip_result_zj"))
+
+
+    if(localStorage.getItem("ip_result_zj")){ipInput.value=localStorage.getItem("ip_result_zj")}
+    if(getCookie("ip_result_zj")){ipInput.value=getCookie("ip_result_zj")}
+
     // 页面加载后自动聚焦
     ipInput.focus();
   </script>
