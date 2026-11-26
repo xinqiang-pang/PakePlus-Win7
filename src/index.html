@@ -141,6 +141,41 @@
   </div>
 
   <script>
+   function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        // 计算过期时间戳
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    // 建议对值进行编码，防止特殊字符导致解析错误
+    const encodedValue = encodeURIComponent(value);
+    document.cookie = name + "=" + encodedValue + expires + "; path=/";
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        // 去除前导空格
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        
+        if (c.indexOf(nameEQ) === 0) {
+            // 解码并返回值
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+    }
+    return null;
+}
+
+
+
+
+
+
     document.getElementById("body").style.backgroundImage = "url('./ippz.png')"
     const ipInput = document.querySelector('.ip-input');
     const submitBtn = document.querySelector('.submit-btn');
@@ -215,22 +250,16 @@
         resultTip.textContent = '❌ IP地址格式不正确，请检查每段是否在0-255之间';
         resultTip.className = 'result-tip error';
       }
-     localStorage.setItem("ip_result_zj",ip)
-     setCookie("ip_result_zj", ip, 7);
+     setCookie("ip_result_zj", ip, 180);
+     //localStorage.setItem("ip_result_zj",ip)
+   
 
     
     }
 
-    
-
-
-
-     alert("  她她她 "+localStorage.getItem("ip_result_zj"))
-    alert(getCookie("ip_result_zj"))
-
-
-    if(localStorage.getItem("ip_result_zj")){ipInput.value=localStorage.getItem("ip_result_zj")}
     if(getCookie("ip_result_zj")){ipInput.value=getCookie("ip_result_zj")}
+    //if(localStorage.getItem("ip_result_zj")){ipInput.value=localStorage.getItem("ip_result_zj")}
+    
 
     // 页面加载后自动聚焦
     ipInput.focus();
