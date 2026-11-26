@@ -1,11 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IP地址配置页面</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .ip-card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 450px;
+    }
+    .ip-card h2 {
+      color: #1a1a1a;
+      margin-bottom: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    .ip-input {
+      width: 100%;
+      height: 50px;
+      padding: 0 15px;
+      font-size: 18px;
+      letter-spacing: 1px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: monospace; /* 使用等宽字体，使IP对齐更美观 */
+    }
+    .ip-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .ip-input.error {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+    }
+    .tip-text {
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .submit-btn {
+      width: 100%;
+      height: 50px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .submit-btn:hover {
+      background: #1d4ed8;
+    }
+    .submit-btn:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+    .result-tip {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+      word-break: break-all;
+    }
+    .result-tip.success {
+      background: #dcfce7;
+      color: #166534;
+      display: block;
+    }
+    .result-tip.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+    }
+  </style>
+</head>
+<body id="body">
+  <div class="ip-card">
+    <h2>服务器IP地址</h2>
+    <div class="input-wrapper">
+      <input type="text" class="ip-input" placeholder="例如：192.168.1.1" maxlength="15">
+    </div>
+    <p class="tip-text">请输入合法的IPv4地址，每段范围0-255</p>
+    <button class="submit-btn">链接</button>
+    <div class="result-tip"></div>
+  </div>
+
+  <script>
+    document.getElementById("body").style.backgroundImage = "url('./ippz.png')"
+    const ipInput = document.querySelector('.ip-input');
+    const submitBtn = document.querySelector('.submit-btn');
+    const resultTip = document.querySelector('.result-tip');
+
+    // 实时格式化与校验
+    ipInput.addEventListener('input', (e) => {
+      let val = e.target.value;
+      
+      // 1. 只允许数字和点号
+      val = val.replace(/[^0-9.]/g, '');
+      
+      // 2. 防止多个连续点号 (如 192..168)
+      val = val.replace(/\.{2,}/g, '.');
+      
+      // 3. 防止以点号开头
+      if (val.startsWith('.')) val = val.substring(1);
+      
+      // 4. 智能处理每一段的数值范围 (0-255)
+      const parts = val.split('.');
+      const formattedParts = parts.map(part => {
+        if (part === '') return '';
+        let num = parseInt(part, 10);
+        if (num > 255) return '255';
+        return num.toString();
+      });
+      
+      // 重新组合，保留末尾可能存在的点号以便继续输入
+      let newVal = formattedParts.join('.');
+      if (val.endsWith('.') && !newVal.endsWith('.')) {
+        newVal += '.';
+      }
+      
+      e.target.value = newVal;
+      
+      // 移除错误样式
+      ipInput.classList.remove('error');
+      resultTip.style.display = 'none';
+    });
+
+    // 提交校验与跳转
+    submitBtn.addEventListener('click', () => {
+      const ip = ipInput.value.trim();
+      
+      // IPv4 正则表达式校验
+      const ipv4Regex = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      
+      if (ipv4Regex.test(ip)) {
+        const targetUrl = `http://${ip}/scxt/rgzh.html`;
+        
+        submitBtn.disabled = true;
+        
+        resultTip.textContent = `✅ 正在连接`;
+        resultTip.className = 'result-tip success';
+        
+        setTimeout(() => {
+          window.location.assign(targetUrl);
+        }, 800);
+      } else {
+        ipInput.classList.add('error');
+        resultTip.textContent = '❌ IP地址格式不正确，请检查每段是否在0-255之间';
+        resultTip.className = 'result-tip error';
+      }
+      window.localStorage.setItem("ip",ip)
+    });
+    if(window.localStorage.getItem("ip")){ipInput.value=window.localStorage.getItem("ip")}
+    // 页面加载后自动聚焦
+    ipInput.focus();
+  </script>
+</body>
 </html>
